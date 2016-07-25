@@ -92,7 +92,8 @@ end
 ```
 
 ## Switch between users for different Operating Systems
-```if node["box"] == 'centos-7' then
+```
+if node["box"] == 'centos-7' then
            node_config.ssh.username = "centos"
          elsif node["box"] == 'trusty64'
            node_config.ssh.username = "ubuntu"
