@@ -70,3 +70,40 @@ unless node["initScript"].nil?
         node_config.vm.provision :shell, path: script["init"], privileged: true
 end
 ```
+
+## Using YAML to iterate through node build configs for key configs on Openstack
+```
+ node_config.vm.provider :openstack do |os|
+        os.keypair_name           = openstack['key']
+        os.username               = openstack['username']
+        os.password               = openstack['password']
+        os.tenant_name            = openstack['tenant']
+        os.flavor                 = node['flavor']
+        os.image                  = node["box"]
+        os.security_groups        = openstack['security_groups'] # SecGroups must be setup prior to usage
+        os.openstack_auth_url     = "http://" + openstack['auth_url'] + ":5000/v2.0/tokens"      # e.g. "#{ENV['OS_AUTH_URL']}/tokens"
+        os.networks               = openstack["tenant_network"]
+        if defined? nodes["floatingip_pool"]
+          os.floating_ip_pool	    = nodes["floatingip_pool"]
+        else
+             os.floating_ip	          = node["floating_ip"]
+        end
+ end
+```
+
+## Switch between users for different Operating Systems
+```if node["box"] == 'centos-7' then
+           node_config.ssh.username = "centos"
+         elsif node["box"] == 'trusty64'
+           node_config.ssh.username = "ubuntu"
+         else
+           node_config.ssh.username = "root"
+         end
+```
+
+## Using YAML to setup forwarded ports (e.g. virtualbox)
+```
+    node["forwards"].each do |port|
+        node_config.vm.network "forwarded_port", guest: port["guest"], host: port["host"], id: port["id"]
+    end
+```

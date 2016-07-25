@@ -99,6 +99,24 @@ Vagrant.configure("2") do |config|
     puppet.manifest_file = 'site.pp'
     puppet.module_path = 'puppet/modules'
   end
+
+  node_config.vm.provider :openstack do |os|
+    os.keypair_name           = openstack['key']
+    os.username               = openstack['username']
+    os.password               = openstack['password']
+    os.tenant_name            = openstack['tenant']
+    os.flavor                 = node['flavor']
+    os.image                  = node["box"]
+    os.security_groups        = openstack['security_groups']
+    os.openstack_auth_url     = "http://" + openstack['auth_url'] + ":5000/v2.0/tokens"      # e.g. "#{ENV['OS_AUTH_URL']}/tokens"
+    os.networks               = openstack["tenant_network"]
+    # if defined? nodes["floatingip_pool"]
+    #   os.floating_ip_pool	    = nodes["floatingip_pool"]
+    # else
+    os.floating_ip	          = node["floating_ip"]
+    # end
+
+  end
 end
 
   # now provision Docker stuff
